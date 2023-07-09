@@ -2,8 +2,8 @@ import { useState } from 'react';
 import 'react-native-get-random-values';
 import { nanoid } from 'nanoid';
 
-import { useDispatch } from 'react-redux';
-import { add } from '../../redux/contacts/contactsSlice'
+import { useDispatch, useSelector } from 'react-redux';
+import { add, getContacts } from '../../redux/contacts/contactsSlice'
 
 import {
   FormWrapper,
@@ -13,6 +13,7 @@ import {
 } from './ContactForm.styled';
 
 export const ContactForm = () => {
+  const contacts = useSelector(getContacts);
   const dispatch = useDispatch();
 
   const [name, setName] = useState('');
@@ -39,6 +40,19 @@ export const ContactForm = () => {
   // функція відправки даних до state
   const handleSubmit = event => {
     event.preventDefault();
+    const form = event.target;
+
+    const doubleContact =
+      contacts.some(
+      ({ name }) =>
+        name.toLowerCase() === form.elements.name.value.toLowerCase()
+    );
+
+      if (doubleContact) {
+       alert(`${form.elements.name.value} is already in contacts`);
+      return;
+      } 
+    
     const id = nanoid(3);
     dispatch(add({ id, name, number }));
     reset();
